@@ -1,0 +1,41 @@
+
+<div id="settings-panel">
+    <div id="settings-header">
+        <h2>Wave Editor</h2>
+        <div id="help" class="top-icon" (click)="openHelp()"></div>
+        <div id="settings" class="top-icon" (click)="openSettings()"></div>
+    </div>
+    <div id="wave-wrapper">
+        <div class="wave-container" *ngFor="let wave of waves">
+            <h3 *ngIf="!wave.editing" (click)="wave.editing=true; focusInput()" wave.name [ngClass]="{'italics': !wave.name.length}">{{wave.name || "Untitled Wave"}}</h3>
+            <input class="notouch" *ngIf="wave.editing" [(ngModel)]="wave.name" type="text" placeholder="Wave Name" (blur)="wave.editing=false" autofocus>
+            
+            <div class="sliders" *ngIf="!wave.base">
+                <p>Wavelength: </p>
+                <input type="range" min="25" max="750" [(ngModel)]="wave.wavelength" />
+                <p>Amplitude: </p>
+                <input type="range" min="1" max="150" [(ngModel)]="wave.amplitude"/>
+                <p>Frequency: </p>
+                <input type="range" min="1" max="150" [(ngModel)]="wave.amplitude"/>
+            </div>
+
+            <span class="italics" *ngIf="wave.base">This wave is automatically set to the current note, all waves below are based on this wave.</span>
+
+            <!--
+                    <p *ngIf="wave.base">This is the base frequency. Frequency is automatically set depening on the note.</p> -->
+            <!-- <p *ngIf="!wave.base">Set the frequency relative to the base frequency.</p> -->
+        </div>
+        <button (click)="newWave()">New Wave</button>
+        <div id="chevron" (click)="toggleMenu()"></div>
+    </div>
+</div>
+<div id="canvas-container">
+    <div id="noteInfo-container">
+        <h1>{{currentNoteName}}</h1>
+        <p>Base Frequency:</p>
+        <h2>{{currentNoteFreq || 0}} Hz</h2>
+    </div>
+    <canvas id="rendering-canvas">
+
+    </canvas>
+</div>
