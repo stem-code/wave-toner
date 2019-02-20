@@ -12,4 +12,11 @@
     <li>For full testing, run <i>ng build --prod</i> in the public directory, then run <i>npm start</i> in the public directory. (Will run on port 8080 by default).<i>
 </ol>
 
+<h1>To-Do</h1>
+<ol>
+    <li>Delegate functionality of physics-graph component into multiple modules</li>
+    <li>Optimize graph drawings</li>
+</ol>
+
 <h2>Written for physics class @ STEM School Highlands Ranch.</h2>
+<b><p>This a test project. It does not contain any Angular "best practices", and is far from optimized.<p></b>
