@@ -19,4 +19,4 @@
 </ol>
 
 <h2>Written for physics class @ STEM School Highlands Ranch.</h2>
-<b><p>This a test project. It does not contain any Angular "best practices", and is far from optimized.<p></b>
+<b><p>This a test project. It does not contain any Angular "best practices" and is far from optimized.<p></b>
