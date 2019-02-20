@@ -22,17 +22,11 @@ if (env === 'production') {
 
 
 app.set('port', process.env.PORT || 8080);
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '/views'));
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-// app.get('/', (req, res) => {
-//     res.;
-// });
-
-app.use(express.static(path.join(__dirname, '/public/dist/tone-project')));
+app.use(express.static(path.join(__dirname, '/public/dist/tone-project'))); // serve Angular
 
 app.listen(app.get('port'), () => {
     console.log("NodeJS App has started on port:", app.get('port'));
