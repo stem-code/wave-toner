@@ -11,4 +11,4 @@
     <li>For full testing, run <i>ng build --prod</i> in the public directory, then run <i>npm start</i> in the public directory. (Will run on port 8080 by default).<i>
 </ol>
 
-<h2>Written at STEM School Highlands Ranch.</h2>
+<h2>Written for physics class @ STEM School Highlands Ranch.</h2>
