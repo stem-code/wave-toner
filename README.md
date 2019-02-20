@@ -1,15 +1,14 @@
-The Project Structure Might be a bit confusing now.
+<h1>Physics Toner Project!</h1>
+<p>This is an Angular project that allows you to construct harmonics and "instruments" by setting frequencies for each base note.</p>
 
-The "public" directory contains all of the Angular 2 Client Code.
-Hint: look in public/src/app/ for code
+<h1>Building / testing from source</h1>
+<ol>
+    <li>Make sure you have NodeJS and NPM</li>
+    <li>Clone the repository. (<i>git clone https://github.com/stem-code/wave-toner.git</i>)</li>
+    <li>Run <i>npm install</i> in the project root directory.</li>
+    <li>Run <i>npm install</i> in the project public directory (Angular).</li>
+    <li>For development, run <i>ng serve</i> inside the public directory, then access port 4200 in a browser.</i>
+    <li>For full testing, run <i>ng build --prod</i> in the public directory, then run npm start in the public directory. (Will run on port 8080 by default).<i>
+</ol>
 
-app.component.ts is the starting point, equivalent to index.html
-
-Some Good Resources For Further Development:
-
-https://magenta.tensorflow.org/nsynth-instrument
-https://magenta.tensorflow.org/assets/nsynth_05_18_17/InstrumentBlog_figs_Z.png
-https://experiments.withgoogle.com/ai/sound-maker/view/
-    - This one is great
-    - Has good interface, let's use it.
-http://www.smartjava.org/examples/webaudio/example3.html
+<h2>Written at STEM School Highlands Ranch.</h2>

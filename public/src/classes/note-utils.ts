@@ -102,6 +102,7 @@ export class Tone {
 export class Timber { // Combine multiple notes along with  to make more realistic sound
     audioCtx: AudioContext;
     tones: Tone[];
+    id: number;
 
     constructor(...notes: Tone[]) {
         this.tones = notes;
@@ -117,5 +118,20 @@ export class Timber { // Combine multiple notes along with  to make more realist
             tone.prepTimeline();
             tone.start();
         });
+    }
+
+    stop() {
+        this.tones.forEach(tone => {
+            tone.stop(0);
+            tone.clear();
+        });
+    }
+
+    setId(id: number) {
+        this.id = id;
+    }
+
+    getId() {
+        return this.id;
     }
 }

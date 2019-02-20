@@ -15,9 +15,6 @@ export class AppComponent { // Main Class
   constructor() {
     console.log('%c Welcome to %c the Belgian %c console!  ',
                 'background: black; color: white', 'background: yellow;', 'background: red; color: white');
-
-
-    // this.playNote();
   }
 
   openSettings() {

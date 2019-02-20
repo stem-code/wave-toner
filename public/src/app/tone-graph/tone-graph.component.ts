@@ -1,11 +1,12 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, ViewChild } from '@angular/core';
 import * as $ from 'jquery';
 import { noteFreqMap } from '../../data/data';
-import { Tone } from '../../../src/classes/note-utils';
+import { Tone, Timber } from '../../../src/classes/note-utils';
 
 interface Wave {
   amplitude: number;
   wavelength: number;
+  frequency: number;
   color: string;
   base: boolean;
   name: string;
@@ -25,41 +26,76 @@ export class ToneGraphComponent implements OnInit {
   gameCanvas: HTMLCanvasElement;
   renderingContext: CanvasRenderingContext2D;
 
-  canvasWidth = 500;
-  canvasHeight = 300;
+  @ViewChild('canvWrapper') canvasWrapper;
+
+  canvasWidth = 0;
+  canvasHeight = 0;
 
   time: number;
   waves: Wave[] = [];
+  harmonic: Timber[] = [];
+  pressedKeys: number[] = [];
 
   audioCtx: AudioContext = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)();
 
   noteIDCounter = 0;
   currentTone: Tone;
-
   menuOpen = true;
 
-  currentNoteName = 'C#';
-  currentNoteFreq = 200;
+  currentNoteName = 'Silence';
+  currentNoteFreq = '0';
 
   tones = [];
 
   constructor() {
-    document.onkeypress = (e: KeyboardEvent) => {
-      const charCode = (typeof e.which === 'number') ? e.which : e.keyCode;
-      const char = String.fromCharCode(charCode);
-      if (!noteFreqMap.hasOwnProperty(char)) {
-        console.log('Invalid Key!');
+    $(document).keydown( (event: any) => {
+      const code = (event.keyCode ? event.keyCode : event.which);
+      const char = String.fromCharCode(code).toLowerCase();
+
+      if (this.pressedKeys.indexOf(code) > -1) {
+        return 0;
       } else {
-        this.currentTone = this.playNote(noteFreqMap[char][5]);
+        this.pressedKeys.push(code);
       }
-    };
+
+      if (noteFreqMap.hasOwnProperty(char)) {
+        this.currentNoteName = char.toUpperCase();
+        this.currentNoteFreq = noteFreqMap[char][5];
+        const baseFrequency = noteFreqMap[char][5];
+        this.constructHarmonic(baseFrequency, 1);
+      }
+    });
+
+    $(document).keyup( (event: any) => {
+      const code = (event.keyCode ? event.keyCode : event.which);
+      const char = String.fromCharCode(code).toLowerCase();
+
+      if (this.pressedKeys.indexOf(code) < 0) { // not in the list
+        return 0;
+      } else {
+        this.pressedKeys.splice(this.pressedKeys.indexOf(code), 1);
+      }
+
+      if (noteFreqMap.hasOwnProperty(char)) {
+        const baseFrequency = noteFreqMap[char][5];
+        this.destroyHarmonic(baseFrequency);
+
+        try {
+          const nodeIdx = String.fromCharCode(this.pressedKeys[this.pressedKeys.length - 1]).toLowerCase();
+          this.currentNoteFreq = noteFreqMap[nodeIdx][5];
+          this.currentNoteName = nodeIdx.toUpperCase();
+        } catch {
+          this.currentNoteFreq = '0';
+          this.currentNoteName = 'Silence';
+        }
+      }
+    });
   }
 
   ngOnInit() {
+    console.log(this.canvasWrapper);
     this.gameCanvas = <HTMLCanvasElement>document.getElementById('rendering-canvas');
 
-    this.gameCanvas.width = this.canvasWidth;
-    this.gameCanvas.height = this.canvasHeight;
 
     console.log(this.gameCanvas);
 
@@ -70,12 +106,20 @@ export class ToneGraphComponent implements OnInit {
     // this.renderingContext.fillRect(x, y, w, h)
     // https://www.w3schools.com/html/html5_canvas.asp
 
-    this.waves.push({wavelength: 350, amplitude: 100, color: 'green', base: true, name: 'Base Frequency', editing: false, priorNum: 0});
+    this.waves.push(
+      {wavelength: 350, amplitude: 100, color: 'green', base: true,
+      name: 'Base Frequency', editing: false, priorNum: 0, frequency: 200 * (1 / 350)}
+    );
 
     const samples = 1000;
     const moveRate = -(1 / samples) * this.canvasWidth;
     console.log(moveRate);
     const renderLoop = () => {
+      this.canvasWidth = this.canvasWrapper.nativeElement.clientWidth;
+      this.canvasHeight = this.canvasWrapper.nativeElement.clientHeight;
+      this.gameCanvas.width = this.canvasWidth;
+      this.gameCanvas.height = this.canvasHeight;
+
       // this.renderingContext.globalCompositeOperation = 'copy';
       // this.renderingContext.imageSmoothingEnabled = false;
       // console.log(-(1 / samples) * this.canvasWidth);
@@ -83,6 +127,11 @@ export class ToneGraphComponent implements OnInit {
       // this.renderingContext.globalCompositeOperation = 'source-over';
 
       this.renderingContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+      this.renderingContext.lineWidth = 1;
+      this.renderingContext.strokeStyle = 'gray';
+      this.renderGraphLines(this.canvasWidth, this.canvasHeight, this.renderingContext, 50);
+
       this.renderingContext.lineWidth = 2;
 
       for (const wave of this.waves) {
@@ -109,6 +158,22 @@ export class ToneGraphComponent implements OnInit {
       renderContext.lineTo((i / samples) * canvasWidth + 2, newNum + (canvasHeight / 2));
       renderContext.stroke();
       priorNum = newNum;
+    }
+  }
+
+  renderGraphLines(canvasWidth: number, canvasHeight: number, renderContext: CanvasRenderingContext2D,
+    distBetweenLines: number) {
+    for (let i = 1; i < canvasWidth / distBetweenLines; i++) {
+      renderContext.beginPath();
+      renderContext.moveTo(i * distBetweenLines, 0);
+      renderContext.lineTo(i * distBetweenLines, canvasHeight);
+      renderContext.stroke();
+    }
+    for (let i = 1; i < canvasHeight / distBetweenLines; i++) {
+      renderContext.beginPath();
+      renderContext.moveTo(0, i * distBetweenLines);
+      renderContext.lineTo(canvasWidth, i * distBetweenLines);
+      renderContext.stroke();
     }
   }
 
@@ -150,8 +215,10 @@ export class ToneGraphComponent implements OnInit {
   }
 
   newWave() {
-    this.waves.push({wavelength: 50, name: '', base: false, color: 'blue', amplitude: 50, editing: false, priorNum: 0});
-    // const toneInfo = {frequency: }
+    this.waves.push(
+      {wavelength: 50, name: '', base: false, color: 'blue',
+      amplitude: 50, editing: false, priorNum: 0, frequency: 200 * (1 / 50)}
+    );
   }
 
   toggleMenu() {
@@ -186,18 +253,55 @@ export class ToneGraphComponent implements OnInit {
     this.help.emit();
   }
 
-  playNote (frequency: number = 50): Tone {
-    if (!this.currentTone) {
-      this.currentTone = new Tone(this.audioCtx);
-      this.currentTone.setFrequency(0);
-      this.currentTone.setAmplitude(0);
-      this.currentTone.start();
-    }
+  constructHarmonic(baseFrequency: number, baseAmplitude: number) { // base frequencies depend on the current note being played
+    const currentTimber = new Timber();
+    currentTimber.setId(baseFrequency); // Each note has a unique bass frequency, this can be used as an ID.
+    this.waves.forEach(wave => {
+      let frequency;
+      if (wave.base) {
+        frequency = baseFrequency;
+      } else {
+        frequency = wave.frequency + baseFrequency; // Frequency is based on the frequency of the base.
+      }
 
-    this.currentTone.setFrequency(frequency, 1, this.audioCtx.currentTime + 0.2);
-    this.currentTone.setAmplitude(0.03, 1, 5);
-    this.currentTone.setPan(0);
+      const amplitude = (wave.amplitude + baseAmplitude) / 5000;
+      console.log(amplitude);
 
-    return this.currentTone;
+      const tone = new Tone(this.audioCtx);
+      tone.setFrequency(frequency);
+      tone.setAmplitude(amplitude);
+      tone.setPan(0);
+
+      currentTimber.addTone(this.audioCtx, tone);
+    });
+    currentTimber.play();
+    this.harmonic.push(currentTimber);
+  }
+
+  destroyHarmonic(baseFrequency: number) {
+    this.harmonic.forEach((timber, idx) => {
+      if (timber.getId() === baseFrequency) { // Check if it is the one we want to turn off
+        timber.stop();
+        this.harmonic.splice(idx, 1);
+      }
+    });
+  }
+
+  playNote (frequency: number = 50, id?: number): Tone {
+    const tone = new Tone(this.audioCtx);
+
+    tone.setFrequency(frequency, 1, this.audioCtx.currentTime + 0.2);
+    tone.setAmplitude(0.03, 1, 5);
+    tone.setPan(0);
+
+    return tone;
+  }
+
+  changeFreq(idx) {
+    this.waves[idx].wavelength = 343 / this.waves[idx].frequency;
+  }
+
+  changeWav(idx) {
+    this.waves[idx].frequency = 343 / this.waves[idx].wavelength;
   }
 }

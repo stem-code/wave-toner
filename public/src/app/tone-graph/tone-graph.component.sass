@@ -3,6 +3,11 @@ canvas
     border-radius: 7px
     display: block
     margin: 0px auto
+    width: 100%
+    display: table-row
+
+canvas+ canvas
+    height: 100%
 
 .italics
     font-style: italic
@@ -144,6 +149,7 @@ canvas
     height: calc(100vh - 40px)
     transition: width 0.4s, transform 0.4s
     padding: 20px
+    display: table
 
 .canvas-container-collapsed
     width: calc(100vw - 90px)!important
