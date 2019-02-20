@@ -1,5 +1,6 @@
 <h1>Physics Toner Project!</h1>
 <p>This is an Angular project that allows you to construct harmonics and "instruments" by setting frequencies for each base note.</p>
+<p>A full demo is available at: wave-toner.herokuapp.com</p>
 
 <h1>Building / testing from source</h1>
 <ol>
