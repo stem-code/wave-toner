@@ -12,7 +12,12 @@
             
             <div class="sliders" *ngIf="!wave.base">
                 <p>Wavelength: </p>
-                <input type="range" min="25" max="750" [(ngModel)]="wave.wavelength" (ngModelChange)="changeWav(i)"/>
+
+                <div class="slider-wrapper">
+                    <input type="range" min="25" max="750" [(ngModel)]="wave.wavelength" (ngModelChange)="changeWav(i)"/>
+                    <div class="sticky-indicator"></div>
+                </div>
+
                 <p>Amplitude: </p>
                 <input type="range" min="1" max="150" [(ngModel)]="wave.amplitude"/>
                 <p>Frequency: </p>
@@ -31,10 +36,29 @@
 </div>
 <div id="canvas-container">
     <div id="noteInfo-container">
-        <p>Note Name: </p>
-        <h2>{{currentNoteName}}</h2>
-        <p>Base Frequency:</p>
-        <h2>{{currentNoteFreq || 0}} Hz</h2>
+        <div id="noteInfo-wrapper">
+            <div class="note-info">
+                <p>Note Name: </p>
+                <h2>{{currentNoteName}}</h2>
+            </div>
+            <div class="note-info">
+                <p>Base Frequency:</p>
+                <h2>{{currentNoteFreq || 0}} Hz</h2>
+            </div>
+            <div class="note-info">
+                <p>Octave:</p>
+                <h2>{{ octave }}</h2>
+            </div>
+            <div class="note-info">
+                <p>Wavetype:</p>
+                <h2>{{(currentNoteFreq > 0) ? 'Sine' : 'None'}}</h2>
+            </div>
+            <div class="note-info">
+                <p># of waves:</p>
+                <h2>{{waves.length}}</h2>
+            </div>
+        </div>
     </div>
     <canvas id="rendering-canvas" #canvWrapper></canvas>
 </div>
+<button (click)="playMusic()" id="testMusic"></button>

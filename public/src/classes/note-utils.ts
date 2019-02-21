@@ -5,6 +5,7 @@
 // Calling the start method triggers this timeline, and will immediately start playing all the settings it was given
 // This is meant to be well-optimized, fast, and flexible
 type timelineType = 'frequency' | 'amplitude' | 'pan';
+// let preppedTones =
 
 export class Tone {
     private oscillator: OscillatorNode;
@@ -14,6 +15,8 @@ export class Tone {
 
     private timeline: {[index: number]: any} = {};
     private timelineId = 1; // increment ID for different tone timeline events
+
+    private gainValue = 0;
 
     constructor(audioCtx) {
         this.audioCtx = audioCtx;
@@ -27,11 +30,18 @@ export class Tone {
         this.panner.connect(this.audioCtx.destination);
     }
 
-    stop(time: number) {
-        this.oscillator.stop(time);
+    stop(time: number, clear: boolean) {
+        console.log(time.toFixed(2));
         this.oscillator.frequency.cancelScheduledValues(0); // immediately cancel all scheduled values
         this.gain.gain.cancelScheduledValues(0);
         this.panner.pan.cancelScheduledValues(0);
+        this.gain.gain.setTargetAtTime(0, time, 0.015);
+
+        if (clear) {
+            setTimeout(() => {
+                this.clear();
+            }, 6000);
+        }
     }
 
     prepTimeline() { // Run through timeline and add all necessary events
@@ -49,7 +59,9 @@ export class Tone {
     }
 
     start(time: number = 0) {
+        this.gain.gain.setValueAtTime(0, 0);
         this.oscillator.start(time);
+        this.gain.gain.setTargetAtTime(this.gainValue, time, 0.015);
         console.log('starting oscillators');
     }
 
@@ -79,6 +91,7 @@ export class Tone {
     }
 
     setAmplitude(amplitude: number, time: number = 0, rampTime: number = 0) { // Volume
+        this.gainValue = amplitude;
         if (rampTime > 0) {
             setTimeout(() => {
                 this.gain.gain.linearRampToValueAtTime(amplitude, rampTime);
@@ -103,12 +116,20 @@ export class Timber { // Combine multiple notes along with  to make more realist
     audioCtx: AudioContext;
     tones: Tone[];
     id: number;
+    preppedTones: Tone[] = [];
 
     constructor(...notes: Tone[]) {
         this.tones = notes;
     }
 
     addTone(audioCtx: AudioContext, tone: Tone) { // Add tone to make timber more complex
+        // if (this.preppedTones.length === 0) {
+        //     for (let i = 0; i < 30; i++) {
+        //         this.preppedTones.push(new Tone(this.audioCtx));
+        //     }
+        // }
+
+
         this.audioCtx = audioCtx;
         this.tones.push(tone);
     }
@@ -120,10 +141,9 @@ export class Timber { // Combine multiple notes along with  to make more realist
         });
     }
 
-    stop() {
+    stop(time: number) {
         this.tones.forEach(tone => {
-            tone.stop(0);
-            tone.clear();
+            tone.stop(time, true);
         });
     }
 

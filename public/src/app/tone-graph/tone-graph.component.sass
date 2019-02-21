@@ -4,7 +4,7 @@ canvas
     display: block
     margin: 0px auto
     width: 100%
-    display: table-row
+    height: calc(100vh - 180px)
 
 canvas+ canvas
     height: 100%
@@ -173,6 +173,17 @@ canvas+ canvas
     border-bottom: 2px solid rgba(255, 255, 255, 0.4)
     margin-bottom: 30px
 
+#noteInfo-wrapper
+    width: fit-content
+    margin: 0px auto
+    height: 100px
+    overflow: hidden
+
+.note-info
+    display: inline-block
+    width: 13vw
+    // margin: 0px 30px
+
 #noteInfo-container h1
     font-size: 3em
 
@@ -183,10 +194,31 @@ canvas+ canvas
 #noteInfo-container h2
     margin: 10px 0px
 
+#testMusic
+    position: absolute
+    bottom: 50px
+    right: 50px
+    border-radius: 50%
+    height: 30px
+    width: 30px
+    border: 0px
+    background-color: #fc5b13
+    background-image: url('/assets/play.svg')
+    background-size: 70%
+    background-position: center
+    background-repeat: no-repeat
+    padding: 25px
+    outline: none
+    transition: filter 0.3s
+    cursor: pointer
+    &:hover
+        filter: brightness(150%)
+
 @supports not (-ms-ime-align:auto)
     input[type=range]
         -webkit-appearance: none 
         margin: 10px 0px
+
 
     input[type=range]::-webkit-slider-thumb
         -webkit-appearance: none
