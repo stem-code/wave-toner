@@ -31,16 +31,20 @@ export class Tone {
     }
 
     stop(time: number, clear: boolean) {
-        console.log(time.toFixed(2));
+        // console.log(time.toFixed(2));
         this.oscillator.frequency.cancelScheduledValues(0); // immediately cancel all scheduled values
         this.gain.gain.cancelScheduledValues(0);
         this.panner.pan.cancelScheduledValues(0);
-        this.gain.gain.setTargetAtTime(0, time, 0.015);
+        if (navigator.appName !== 'Netscape') {
+            this.gain.gain.setTargetAtTime(0, time, 0.015);
+        } else {
+            this.gain.gain.linearRampToValueAtTime(0, time + 0.1);
+        }
 
         if (clear) {
             setTimeout(() => {
                 this.clear();
-            }, 6000);
+            }, 500);
         }
     }
 
@@ -61,11 +65,21 @@ export class Tone {
     start(time: number = 0) {
         this.gain.gain.setValueAtTime(0, 0);
         this.oscillator.start(time);
-        this.gain.gain.setTargetAtTime(this.gainValue, time, 0.015);
-        console.log('starting oscillators');
+        if (navigator.appName !== 'Netscape') {
+            this.gain.gain.setTargetAtTime(this.gainValue, time, 0.015);
+        } else {
+            this.gain.gain.linearRampToValueAtTime(this.gainValue, time + 0.1);
+        }
+        // this.gain.gain.setTargetAtTime(this.gainValue, time, 0.1);
+        // console.log('starting oscillators');
     }
 
     clear() {
+        // console.log('Goodbye!');
+        this.oscillator.stop();
+        this.oscillator.disconnect();
+        this.gain.disconnect();
+        this.panner.disconnect();
         delete(this.oscillator);
         delete(this.panner);
         delete(this.gain);

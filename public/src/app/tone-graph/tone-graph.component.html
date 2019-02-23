@@ -7,21 +7,25 @@
     </div>
     <div id="wave-wrapper">
         <div class="wave-container" *ngFor="let wave of waves; let i=index;">
-            <h3 *ngIf="!wave.editing" (click)="wave.editing=true; focusInput()" wave.name [ngClass]="{'italics': !wave.name.length}">{{wave.name || "Untitled Wave"}}</h3>
+            <div class="close-button" *ngIf="!wave.editing && !wave.base" (click)="deleteWave(i)"></div>
+            <h3 *ngIf="!wave.editing" (click)="wave.editing=true; focusInput()" wave.name [ngClass]="{'italics': !wave.name.length, 'rightMargin': !wave.base}">{{wave.name || "Untitled Wave"}}</h3>
             <input class="notouch" *ngIf="wave.editing" [(ngModel)]="wave.name" type="text" placeholder="Wave Name" (blur)="wave.editing=false" autofocus>
             
             <div class="sliders" *ngIf="!wave.base">
-                <p>Wavelength: </p>
-
-                <div class="slider-wrapper">
-                    <input type="range" min="25" max="750" [(ngModel)]="wave.wavelength" (ngModelChange)="changeWav(i)"/>
-                    <div class="sticky-indicator"></div>
-                </div>
+                <!-- <p>Wavelength: </p>
+                <input type="range" min="0" max="100" [(ngModel)]="wave.wavelength" (ngModelChange)="changeWav(i)"/>
+                     -->
 
                 <p>Amplitude: </p>
-                <input type="range" min="1" max="150" [(ngModel)]="wave.amplitude"/>
+                <div class="slider-wrapper">
+                    <input class="slider" type="range" min="0" max="80" [(ngModel)]="wave.amplitude"/>
+                    <div class="sticky-indicator">{{wave.amplitude}}% of base amplitude.</div>
+                </div>
                 <p>Frequency: </p>
-                <input type="range" min="1" max="150" [(ngModel)]="wave.frequency" (ngModelChange)="changeFreq(i)"/>
+                <div class="slider-wrapper">
+                    <input class="slider" type="range" min="0" max="400" [(ngModel)]="wave.frequency" (ngModelChange)="changeFreq(i)"/>
+                    <div class="sticky-indicator">{{wave.frequency}}% of base frequency.</div>
+                </div>
             </div>
 
             <span class="italics" *ngIf="wave.base">This wave is automatically set to the current note, all waves below are based on this wave.</span>

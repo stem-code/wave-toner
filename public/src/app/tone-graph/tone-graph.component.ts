@@ -35,6 +35,7 @@ export class ToneGraphComponent implements OnInit {
   waves: Wave[] = [];
   harmonic: Timber[] = [];
   pressedKeys: number[] = [];
+  baseWave: Wave;
 
   audioCtx: AudioContext = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)();
 
@@ -44,14 +45,21 @@ export class ToneGraphComponent implements OnInit {
 
   currentNoteName = 'Silence';
   currentNoteFreq = '0';
-  octave = 0;
+  octave = 4;
 
   tones = [];
+
+  stickyAmpTimeout: any;
+  stickyFreqTimeout: any;
 
   constructor() {
     $(document).keydown( (event: any) => {
       const code = (event.keyCode ? event.keyCode : event.which);
       const char = String.fromCharCode(code).toLowerCase();
+
+      if (char === 'q') {
+        this.reset();
+      }
 
       if (this.pressedKeys.indexOf(code) > -1) {
         return 0;
@@ -135,8 +143,6 @@ export class ToneGraphComponent implements OnInit {
         e.which = lastKey.charCodeAt(0);
         $(document).trigger(e);
 
-        console.log('Keyup', lastKey);
-
         setTimeout(() => {
           setTimeout(player, (1000 / bps) * 0.7);
           this.octave = notes[incr]['o'];
@@ -144,7 +150,6 @@ export class ToneGraphComponent implements OnInit {
           e.which = notes[incr]['n'].charCodeAt(0);
           $(document).trigger(e);
           lastKey = notes[incr]['n'];
-          console.log('Keydown', notes[incr]['n']);
         }, (1000 / bps) * 0.3);
       } else {
         setTimeout(player, 1000 / bps);
@@ -158,9 +163,6 @@ export class ToneGraphComponent implements OnInit {
     console.log(this.canvasWrapper);
     this.gameCanvas = <HTMLCanvasElement>document.getElementById('rendering-canvas');
 
-
-    console.log(this.gameCanvas);
-
     this.renderingContext = this.gameCanvas.getContext('2d');
     this.time = 0;
 
@@ -170,12 +172,13 @@ export class ToneGraphComponent implements OnInit {
 
     this.waves.push(
       {wavelength: 350, amplitude: 100, color: 'green', base: true,
-      name: 'Base Frequency', editing: false, priorNum: 0, frequency: 200 * (1 / 350)}
+      name: 'Base Frequency', editing: false, priorNum: 0, frequency: 100 / 350}
     );
+    this.baseWave = this.waves[this.waves.length - 1];
 
     const samples = 1000;
     const moveRate = -(1 / samples) * this.canvasWidth;
-    console.log(moveRate);
+    // console.log(moveRate);
     const renderLoop = () => {
       this.canvasWidth = this.canvasWrapper.nativeElement.clientWidth;
       this.canvasHeight = this.canvasWrapper.nativeElement.clientHeight;
@@ -197,12 +200,21 @@ export class ToneGraphComponent implements OnInit {
       this.renderingContext.lineWidth = 2;
 
       for (const wave of this.waves) {
-        this.renderingContext.strokeStyle = wave.color;
-        this.renderWave(this.canvasWidth, this.canvasHeight, this.renderingContext, wave.amplitude, wave.wavelength, this.time, samples);
+        if (wave.base) {
+          this.renderingContext.strokeStyle = wave.color;
+          this.renderWave(this.canvasWidth, this.canvasHeight, this.renderingContext, wave.amplitude, wave.wavelength, this.time, samples);
+        } else {
+          const freq = this.baseWave.frequency * (wave.frequency / 100);
+          const wavelength = 100 / freq;
+          const amplitude = (wave.amplitude / 100) * this.baseWave.amplitude;
+
+          this.renderingContext.strokeStyle = wave.color;
+          this.renderWave(this.canvasWidth, this.canvasHeight, this.renderingContext, amplitude, wavelength, this.time, samples);
+        }
       }
 
       this.renderingContext.strokeStyle = '#AB47BC';
-      this.renderCombinedWave(this.canvasWidth, this.canvasHeight, this.renderingContext, this.waves, this.time, 1000);
+      // this.renderCombinedWave(this.canvasWidth, this.canvasHeight, this.renderingContext, this.waves, this.time, 1000);
 
       this.time += Math.PI * 0.5;
       requestAnimationFrame(renderLoop);
@@ -210,6 +222,8 @@ export class ToneGraphComponent implements OnInit {
 
     renderLoop();
     // this.playMusic();
+
+    console.log($('.slider'));
   }
 
   renderWave(canvasWidth: number, canvasHeight: number, renderContext: CanvasRenderingContext2D,
@@ -280,8 +294,8 @@ export class ToneGraphComponent implements OnInit {
 
   newWave() {
     this.waves.push(
-      {wavelength: 50, name: '', base: false, color: 'blue',
-      amplitude: 50, editing: false, priorNum: 0, frequency: 200 * (1 / 50)}
+      {wavelength: 2, name: '', base: false, color: 'blue',
+      amplitude: 50, editing: false, priorNum: 0, frequency: 100}
     );
   }
 
@@ -325,11 +339,11 @@ export class ToneGraphComponent implements OnInit {
       if (wave.base) {
         frequency = baseFrequency;
       } else {
-        frequency = wave.frequency + baseFrequency; // Frequency is based on the frequency of the base.
+        frequency = (wave.frequency / 100) * baseFrequency; // Frequency is based on the frequency of the base.
       }
 
       const amplitude = (wave.amplitude + baseAmplitude) / 5000;
-      console.log(amplitude);
+      // console.log(amplitude);
 
       const tone = new Tone(this.audioCtx);
       tone.setFrequency(frequency);
@@ -347,6 +361,7 @@ export class ToneGraphComponent implements OnInit {
       if (timber.getId() === baseFrequency) { // Check if it is the one we want to turn off
         timber.stop(this.audioCtx.currentTime);
         this.harmonic.splice(idx, 1);
+        // console.log('Splicing', this.harmonic);
       }
     });
   }
@@ -362,10 +377,20 @@ export class ToneGraphComponent implements OnInit {
   }
 
   changeFreq(idx) {
-    this.waves[idx].wavelength = 343 / this.waves[idx].frequency;
+    this.waves[idx].wavelength = 100 / this.waves[idx].frequency;
   }
 
   changeWav(idx) {
-    this.waves[idx].frequency = 343 / this.waves[idx].wavelength;
+    this.waves[idx].frequency = 100 / this.waves[idx].wavelength;
+  }
+
+  deleteWave(idx) {
+    this.waves.splice(idx, 1);
+  }
+
+  reset() {
+    console.log('reset');
+    this.audioCtx.close();
+    this.audioCtx = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)();
   }
 }

@@ -12,6 +12,10 @@ canvas+ canvas
 .italics
     font-style: italic
 
+.slider-wrapper:hover .sticky-indicator
+    opacity: 0.8
+
+
 #settings-panel
     width: 190px
     padding-left: 10px
@@ -155,12 +159,51 @@ canvas+ canvas
     width: calc(100vw - 90px)!important
     transform: translateX(-150px)!important
 
+.close-button
+    position: relative
+    right: -5px
+    width: 20px
+    height: 20px
+    background-image: url("/assets/close.svg")
+    background-position: center
+    margin: 0px 5px
+    border-radius: 50%
+    padding: 2px
+    cursor: pointer
+    transition: background-color 0.1s
+    float: right
+
+.close-button:hover
+    background-color: rgba(255, 255, 255, 0.3)
+
+.rightMargin
+    margin-right: 20px
+
 .wave-container::after
     content: ''
     border-top: 3px solid rgba(255, 255, 255, 0.5)
     width: 100%
     display: inline-block
     border-radius: 3px
+
+.sticky-indicator
+    height: 30px
+    background-color: #fefefe
+    position: absolute
+    right: -20px
+    transform: translate(80%, -25px)
+    z-index: 500
+    width: 180px
+    text-align: left
+    line-height: 30px
+    vertical-align: middle
+    padding: 0px 0px 0px 10px
+    border-radius: 4px
+    opacity: 0
+    transition: opacity 0.2s
+
+.sticky-show
+    opacity: 0.8
 
 #noteInfo-container 
     text-align: center
