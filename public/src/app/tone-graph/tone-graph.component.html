@@ -65,4 +65,11 @@
     </div>
     <canvas id="rendering-canvas" #canvWrapper></canvas>
 </div>
-<button (click)="playMusic()" id="testMusic"></button>
+
+<app-file-window [mode]="fileMode" [savedata]="waves" (wavesdata)="setWaveData($event)"></app-file-window>
+
+<div id="roundButton-container">
+    <button (click)="save()" class="roundButton" id="save-button"></button>
+    <button (click)="open()" class="roundButton" id="open-button"></button>
+    <button (click)="playMusic()" class="roundButton" id="play-button"></button>
+</div>

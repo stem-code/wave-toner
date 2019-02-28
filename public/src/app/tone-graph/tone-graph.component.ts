@@ -52,6 +52,8 @@ export class ToneGraphComponent implements OnInit {
   stickyAmpTimeout: any;
   stickyFreqTimeout: any;
 
+  fileMode = 'save';
+
   constructor() {
     $(document).keydown( (event: any) => {
       const code = (event.keyCode ? event.keyCode : event.which);
@@ -160,7 +162,19 @@ export class ToneGraphComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.canvasWrapper);
+    // const waves = JSON.parse(localStorage.getItem('waves'));
+    const waves  = false;
+    if (waves) {
+      this.waves = JSON.parse(localStorage.getItem('waves'));
+      this.baseWave = this.waves[0];
+    } else {
+      this.waves.push(
+        {wavelength: 350, amplitude: 100, color: 'green', base: true,
+        name: 'Base Frequency', editing: false, priorNum: 0, frequency: 100 / 350}
+      );
+      this.baseWave = this.waves[this.waves.length - 1];
+    }
+
     this.gameCanvas = <HTMLCanvasElement>document.getElementById('rendering-canvas');
 
     this.renderingContext = this.gameCanvas.getContext('2d');
@@ -169,12 +183,6 @@ export class ToneGraphComponent implements OnInit {
     // Some examples:
     // this.renderingContext.fillRect(x, y, w, h)
     // https://www.w3schools.com/html/html5_canvas.asp
-
-    this.waves.push(
-      {wavelength: 350, amplitude: 100, color: 'green', base: true,
-      name: 'Base Frequency', editing: false, priorNum: 0, frequency: 100 / 350}
-    );
-    this.baseWave = this.waves[this.waves.length - 1];
 
     const samples = 1000;
     const moveRate = -(1 / samples) * this.canvasWidth;
@@ -392,5 +400,21 @@ export class ToneGraphComponent implements OnInit {
     console.log('reset');
     this.audioCtx.close();
     this.audioCtx = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)();
+  }
+
+  save() {
+    this.fileMode = 'save';
+    $('app-file-window').css({'z-index': 5000, 'opacity': 1});
+  }
+
+  open() {
+    this.fileMode = 'open';
+    $('app-file-window').css({'z-index': 5000, 'opacity': 1});
+  }
+
+  setWaveData(event) {
+    console.log(event);
+    this.waves = event.waves;
+    $('app-file-window').css({'z-index': -5000, 'opacity': 0});
   }
 }

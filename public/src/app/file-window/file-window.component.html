@@ -1,0 +1,15 @@
+<div class="file-window">
+  <div class="file-window-header">
+    <input placeholder="File name" [(ngModel)]="fieldValue">
+    <button *ngIf="mode === 'save'" class="action-button" (click)="save()">Save</button>
+    <button *ngIf="mode === 'open'" class="action-button" (click)="loadWavesFromSave()">Open</button>
+  </div>
+  <div>
+    <p>Saved Harmonics: </p>
+    <div class="row-data" *ngFor="let save of saves; let i=index" (click)="setSave(i)" [ngClass]="{'selected': currentSave == i}">
+      {{ save.name }}
+    </div>
+    <p *ngIf="checkOverwrite() && mode == 'save'">NOTE: This will overwrite {{fieldValue}}.</p>
+    <p *ngIf="!checkOverwrite() && mode == 'save'">This will create a new save.</p>
+  </div>
+</div>

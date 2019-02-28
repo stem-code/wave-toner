@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { TitleScreenComponent } from './title-screen/title-screen.component';
 import { SettingsComponent } from './settings/settings.component';
 import { HelpComponent } from './help/help.component';
+import { FileWindowComponent } from './file-window/file-window.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { HelpComponent } from './help/help.component';
     ToneGraphComponent,
     TitleScreenComponent,
     SettingsComponent,
-    HelpComponent
+    HelpComponent,
+    FileWindowComponent
   ],
   imports: [
     BrowserModule,

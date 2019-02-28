@@ -15,6 +15,15 @@ canvas+ canvas
 .slider-wrapper:hover .sticky-indicator
     opacity: 0.8
 
+app-file-window
+    position: fixed
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    opacity: 0
+    z-index: -10
+    width: 300px
+    height: 400px
 
 #settings-panel
     width: 190px
@@ -237,13 +246,17 @@ canvas+ canvas
 #noteInfo-container h2
     margin: 10px 0px
 
-#testMusic
+#roundButton-container
     position: absolute
     bottom: 50px
     right: 50px
+
+.roundButton
+    display: block
     border-radius: 50%
     height: 30px
     width: 30px
+    margin-top: 20px
     border: 0px
     background-color: #fc5b13
     background-image: url('/assets/play.svg')
@@ -256,6 +269,13 @@ canvas+ canvas
     cursor: pointer
     &:hover
         filter: brightness(150%)
+
+#open-button
+    background-image: url('/assets/book-open-variant.svg')
+#save-button
+    background-image: url('/assets/content-save.svg')
+#play-button
+    background-image: url('/assets/play.svg')
 
 @supports not (-ms-ime-align:auto)
     input[type=range]
