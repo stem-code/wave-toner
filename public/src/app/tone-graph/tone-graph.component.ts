@@ -27,6 +27,7 @@ export class ToneGraphComponent implements OnInit {
   renderingContext: CanvasRenderingContext2D;
 
   @ViewChild('canvWrapper') canvasWrapper;
+  @ViewChild('waveWrapper') waveWrapper;
 
   canvasWidth = 0;
   canvasHeight = 0;
@@ -38,6 +39,7 @@ export class ToneGraphComponent implements OnInit {
   baseWave: Wave;
 
   audioCtx: AudioContext = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)();
+  brickwallLimiter: any;
 
   noteIDCounter = 0;
   currentTone: Tone;
@@ -55,6 +57,14 @@ export class ToneGraphComponent implements OnInit {
   fileMode = 'save';
 
   constructor() {
+    this.brickwallLimiter = this.audioCtx.createDynamicsCompressor();
+    this.brickwallLimiter.threshold.value = 0.0;
+    this.brickwallLimiter.knee.value = 0.0;
+    this.brickwallLimiter.ratio.value = 20;
+    this.brickwallLimiter.attack.value = 0.005;
+    this.brickwallLimiter.release.value = 0.050;
+    this.brickwallLimiter.connect(this.audioCtx.destination);
+
     $(document).keydown( (event: any) => {
       const code = (event.keyCode ? event.keyCode : event.which);
       const char = String.fromCharCode(code).toLowerCase();
@@ -339,21 +349,40 @@ export class ToneGraphComponent implements OnInit {
     this.help.emit();
   }
 
+  // normalizeAmplitudes() { // Super inefficient, may need to find better way of doing this.
+  //   let totalAmplitude = 1;
+  //   console.log('Normalizing Amplitudes');
+  //   this.waves.forEach(wave => {
+  //     if (wave.base) {
+  //       totalAmplitude += 1;
+  //     } else {
+  //       totalAmplitude += (wave.amplitude / 100);
+  //     }
+  //   });
+  //   this.waves.forEach(wave => {
+  //     wave.amplitude = wave.amplitude / totalAmplitude;
+  //   });
+  // }
+
   constructHarmonic(baseFrequency: number, baseAmplitude: number) { // base frequencies depend on the current note being played
     const currentTimber = new Timber();
     currentTimber.setId(baseFrequency); // Each note has a unique bass frequency, this can be used as an ID.
     this.waves.forEach(wave => {
       let frequency;
+      let amplitude;
       if (wave.base) {
         frequency = baseFrequency;
+        amplitude = baseAmplitude / (this.waves.length * 3 + 5);
+        console.log('Base amplitude is: ', amplitude);
       } else {
         frequency = (wave.frequency / 100) * baseFrequency; // Frequency is based on the frequency of the base.
+        console.log('New frequency is: ', frequency);
+        amplitude = (wave.amplitude / 100) * baseAmplitude / (this.waves.length * 3 + 5);
+        console.log('New Amplitude is', amplitude);
       }
-
-      const amplitude = (wave.amplitude + baseAmplitude) / 5000;
       // console.log(amplitude);
 
-      const tone = new Tone(this.audioCtx);
+      const tone = new Tone(this.audioCtx, this.brickwallLimiter);
       tone.setFrequency(frequency);
       tone.setAmplitude(amplitude);
       tone.setPan(0);
@@ -375,7 +404,7 @@ export class ToneGraphComponent implements OnInit {
   }
 
   playNote (frequency: number = 50, id?: number): Tone {
-    const tone = new Tone(this.audioCtx);
+    const tone = new Tone(this.audioCtx, this.brickwallLimiter);
 
     tone.setFrequency(frequency, 1, this.audioCtx.currentTime + 0.2);
     tone.setAmplitude(0.03, 1, 5);

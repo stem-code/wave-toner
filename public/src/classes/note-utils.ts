@@ -18,7 +18,7 @@ export class Tone {
 
     private gainValue = 0;
 
-    constructor(audioCtx) {
+    constructor(audioCtx, connectorNode) {
         this.audioCtx = audioCtx;
 
         this.oscillator = <OscillatorNode>this.audioCtx.createOscillator();
@@ -27,7 +27,7 @@ export class Tone {
 
         this.oscillator.connect(this.gain);
         this.gain.connect(this.panner);
-        this.panner.connect(this.audioCtx.destination);
+        this.panner.connect(connectorNode);
     }
 
     stop(time: number, clear: boolean) {
@@ -137,13 +137,6 @@ export class Timber { // Combine multiple notes along with  to make more realist
     }
 
     addTone(audioCtx: AudioContext, tone: Tone) { // Add tone to make timber more complex
-        // if (this.preppedTones.length === 0) {
-        //     for (let i = 0; i < 30; i++) {
-        //         this.preppedTones.push(new Tone(this.audioCtx));
-        //     }
-        // }
-
-
         this.audioCtx = audioCtx;
         this.tones.push(tone);
     }

@@ -5,7 +5,7 @@
         <div id="help" class="top-icon" (click)="openHelp()"></div>
         <div id="settings" class="top-icon" (click)="openSettings()"></div>
     </div>
-    <div id="wave-wrapper">
+    <div id="wave-wrapper" #waveWrapper>
         <div class="wave-container" *ngFor="let wave of waves; let i=index;">
             <div class="close-button" *ngIf="!wave.editing && !wave.base" (click)="deleteWave(i)"></div>
             <h3 *ngIf="!wave.editing" (click)="wave.editing=true; focusInput()" wave.name [ngClass]="{'italics': !wave.name.length, 'rightMargin': !wave.base}">{{wave.name || "Untitled Wave"}}</h3>
@@ -19,12 +19,12 @@
                 <p>Amplitude: </p>
                 <div class="slider-wrapper">
                     <input class="slider" type="range" min="0" max="80" [(ngModel)]="wave.amplitude"/>
-                    <div class="sticky-indicator">{{wave.amplitude}}% of base amplitude.</div>
+                    <div class="sticky-indicator" [ngStyle]="{'transform':'translate(80%, ' + (-25-waveWrapper.scrollTop) + 'px)'}">{{wave.amplitude}}% of base amplitude.</div>
                 </div>
                 <p>Frequency: </p>
                 <div class="slider-wrapper">
                     <input class="slider" type="range" min="0" max="400" [(ngModel)]="wave.frequency" (ngModelChange)="changeFreq(i)"/>
-                    <div class="sticky-indicator">{{wave.frequency}}% of base frequency.</div>
+                    <div class="sticky-indicator" [ngStyle]="{'transform':'translate(80%, ' + (-25-waveWrapper.scrollTop) + 'px)'}">{{wave.frequency}}% of base frequency.</div>
                 </div>
             </div>
 
