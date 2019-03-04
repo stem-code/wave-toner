@@ -372,12 +372,12 @@ export class ToneGraphComponent implements OnInit {
       let amplitude;
       if (wave.base) {
         frequency = baseFrequency;
-        amplitude = baseAmplitude / (this.waves.length * 3 + 5);
+        amplitude = baseAmplitude / (this.waves.length * this.pressedKeys.length + 2);
         console.log('Base amplitude is: ', amplitude);
       } else {
         frequency = (wave.frequency / 100) * baseFrequency; // Frequency is based on the frequency of the base.
         console.log('New frequency is: ', frequency);
-        amplitude = (wave.amplitude / 100) * baseAmplitude / (this.waves.length * 3 + 5);
+        amplitude = (wave.amplitude / 100) * baseAmplitude / (this.waves.length * this.pressedKeys.length + 2);
         console.log('New Amplitude is', amplitude);
       }
       // console.log(amplitude);

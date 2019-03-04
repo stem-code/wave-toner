@@ -44,7 +44,6 @@ var getEnvelope = function(data, attackTime, releaseTime, sampleRate){
 		if (envelopeSample < envIn){
 			
 			envelopeSample = envIn + attackGain * (envelopeSample - envIn);
-			
 		}
 		
 		else {
