@@ -211,12 +211,10 @@ export class ToneGraphComponent implements OnInit {
 
       this.renderingContext.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
-      this.renderingContext.lineWidth = 1;
       this.renderingContext.strokeStyle = 'gray';
       this.renderGraphLines(this.canvasWidth, this.canvasHeight, this.renderingContext, 50);
 
-      this.renderingContext.lineWidth = 2;
-
+      this.renderingContext.lineWidth = 1;
       for (const wave of this.waves) {
         if (wave.base) {
           this.renderingContext.strokeStyle = wave.color;
@@ -231,8 +229,9 @@ export class ToneGraphComponent implements OnInit {
         }
       }
 
+      this.renderingContext.lineWidth = 4;
       this.renderingContext.strokeStyle = '#AB47BC';
-      // this.renderCombinedWave(this.canvasWidth, this.canvasHeight, this.renderingContext, this.waves, this.time, 1000);
+      this.renderCombinedWave(this.canvasWidth, this.canvasHeight, this.renderingContext, this.waves, this.time, 1000);
 
       this.time += Math.PI * 0.5;
       requestAnimationFrame(renderLoop);
@@ -242,19 +241,6 @@ export class ToneGraphComponent implements OnInit {
     // this.playMusic();
 
     console.log($('.slider'));
-  }
-
-  renderWave(canvasWidth: number, canvasHeight: number, renderContext: CanvasRenderingContext2D,
-              amplitude: number, wavelength: number, time: number, samples: number) {
-    let priorNum = amplitude * Math.sin(2 * Math.PI * time / wavelength);
-    for (let i = 1; i < samples; i++) {
-      const newNum = amplitude * Math.sin(2 * Math.PI * ((i / samples) * canvasWidth + time) / wavelength);
-      renderContext.beginPath();
-      renderContext.moveTo(((i - 1) / samples) * canvasWidth, priorNum + (canvasHeight / 2));
-      renderContext.lineTo((i / samples) * canvasWidth + 2, newNum + (canvasHeight / 2));
-      renderContext.stroke();
-      priorNum = newNum;
-    }
   }
 
   renderGraphLines(canvasWidth: number, canvasHeight: number, renderContext: CanvasRenderingContext2D,
@@ -284,6 +270,19 @@ export class ToneGraphComponent implements OnInit {
       return newNum;
   }
 
+  renderWave(canvasWidth: number, canvasHeight: number, renderContext: CanvasRenderingContext2D,
+    amplitude: number, wavelength: number, time: number, samples: number) {
+    let priorNum = amplitude * Math.sin(2 * Math.PI * time / wavelength);
+    for (let i = 1; i < samples; i++) {
+      const newNum = amplitude * Math.sin(2 * Math.PI * ((i / samples) * canvasWidth + time) / wavelength);
+      renderContext.beginPath();
+      renderContext.moveTo(((i - 1) / samples) * canvasWidth, priorNum + (canvasHeight / 2));
+      renderContext.lineTo((i / samples) * canvasWidth + 2, newNum + (canvasHeight / 2));
+      renderContext.stroke();
+      priorNum = newNum;
+    }
+  }
+
   renderCombinedWave(
       canvasWidth: number,
       canvasHeight: number,
@@ -291,15 +290,42 @@ export class ToneGraphComponent implements OnInit {
       waves: Wave[],
       time: number,
       samples: number) {
+
     let priorNum = 0;
     for (const wave of waves) {
-      priorNum += wave.amplitude * Math.sin(2 * Math.PI * time / wave.wavelength);
+      let freqT;
+      let wavelengthT;
+      if (wave.base) {
+        freqT = this.baseWave.frequency;
+        wavelengthT = 100 / freqT;
+      } else {
+        freqT = this.baseWave.frequency * (wave.frequency / 100);
+        wavelengthT = 100 / freqT;
+      }
+
+      console.log(wave);
+      const amplitude = (wave.amplitude / 100) * this.baseWave.amplitude;
+      priorNum += (amplitude) * Math.sin(2 * Math.PI * time / wavelengthT);
     }
 
     for (let i = 1; i < samples; i++) {
       let newNum = 0;
       for (const wave of waves) {
-        newNum += wave.amplitude * Math.sin(2 * Math.PI * ((i / samples) * canvasWidth + time) / wave.wavelength);
+        let freqT;
+        let wavelengthT;
+        if (wave.base) {
+          freqT = this.baseWave.frequency;
+          wavelengthT = 100 / freqT;
+        } else {
+          freqT = this.baseWave.frequency * (wave.frequency / 100);
+          wavelengthT = 100 / freqT;
+        }
+
+        const freq = this.baseWave.frequency * (wave.frequency / 100);
+        const wavelength = 100 / freq;
+        const amplitude = (wave.amplitude / 100) * this.baseWave.amplitude;
+
+        newNum += (amplitude) * Math.sin(2 * Math.PI * ((i / samples) * canvasWidth + time) / wavelengthT);
       }
 
       renderContext.beginPath();
