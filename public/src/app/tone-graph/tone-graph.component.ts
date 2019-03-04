@@ -303,7 +303,7 @@ export class ToneGraphComponent implements OnInit {
         wavelengthT = 100 / freqT;
       }
 
-      console.log(wave);
+      // console.log(wave);
       const amplitude = (wave.amplitude / 100) * this.baseWave.amplitude;
       priorNum += (amplitude) * Math.sin(2 * Math.PI * time / wavelengthT);
     }

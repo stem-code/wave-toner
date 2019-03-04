@@ -16,5 +16,12 @@
   <script src="assets/limiter.js"></script>
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
+  <script>
+    if ( 'serviceWorker' in navigator ) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/ngsw-worker.js');
+      });
+    }
+  </script>
 </body>
 </html>
