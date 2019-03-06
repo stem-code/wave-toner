@@ -2,6 +2,7 @@
   <div class="file-window-header">
     <input placeholder="File name" [(ngModel)]="fieldValue">
     <button *ngIf="mode === 'save'" class="action-button" (click)="save()">Save</button>
+    <button *ngIf="mode === 'close'" class="action-button" (click)="close()">Close</button>
     <button *ngIf="mode === 'open'" class="action-button" (click)="loadWavesFromSave()">Open</button>
   </div>
   <div>
