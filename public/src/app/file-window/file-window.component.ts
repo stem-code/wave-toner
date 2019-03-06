@@ -45,7 +45,7 @@ export class FileWindowComponent implements OnInit, OnChanges {
   }
 
   close() {
-    this.wavesdata.emit(null);
+    this.wavesdata.emit();
     console.log('Closed Window!');
   }
 
