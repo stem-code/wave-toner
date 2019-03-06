@@ -43,7 +43,7 @@ export class FileWindowComponent implements OnInit, OnChanges {
     this.wavesdata.emit(SaveManager.retrieveSave(saveName));
     console.log('Save complete!');
   }
-  
+
   private close() {
     this.wavesdata.emit(null);
     console.log('Closed Window!');
