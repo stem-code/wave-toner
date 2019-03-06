@@ -23,7 +23,7 @@
                 </div>
                 <p>Frequency: </p>
                 <div class="slider-wrapper">
-                    <input class="slider" type="range" min="0" max="400" [(ngModel)]="wave.frequency" (ngModelChange)="changeFreq(i)"/>
+                    <input class="slider" type="range" min="0" max="800" [(ngModel)]="wave.frequency" (ngModelChange)="changeFreq(i)"/>
                     <div class="sticky-indicator" [ngStyle]="{'transform':'translate(80%, ' + (-25-waveWrapper.scrollTop) + 'px)'}">{{wave.frequency}}% of base frequency.</div>
                 </div>
             </div>
