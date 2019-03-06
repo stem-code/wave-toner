@@ -28,7 +28,7 @@ export class FileWindowComponent implements OnInit, OnChanges {
     this.fieldValue = this.saves[0].name;
   }
 
-  private save(saveName?: string, saveData?: any) {
+  save(saveName?: string, saveData?: any) {
     console.log(saveName, saveData);
     if (!saveName) {
       saveName = this.fieldValue;
@@ -44,7 +44,7 @@ export class FileWindowComponent implements OnInit, OnChanges {
     console.log('Save complete!');
   }
 
-  private close() {
+  close() {
     this.wavesdata.emit(null);
     console.log('Closed Window!');
   }
