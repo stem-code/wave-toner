@@ -469,6 +469,9 @@ export class ToneGraphComponent implements OnInit {
 
   setWaveData(event) {
     console.log(event);
+    if (!event) {
+       return 0;
+    }
     this.waves = event.waves;
     $('app-file-window').css({'z-index': -5000, 'opacity': 0});
   }
