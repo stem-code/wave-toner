@@ -4,6 +4,7 @@
     border-radius: 5px
     background-color: #333333
     padding: 30px
+    padding-top: 50px
 
 p
     text-align: center
@@ -22,6 +23,21 @@ p
 .action-button:hover
     background-color: #fc5b13
 
+.close-button
+    position: absolute
+    top: 10px
+    right: -40px
+    float: right
+    width: 30px
+    height: 30px
+    background-image: url("/assets/close.svg")
+    background-size: cover
+    border-radius: 50%
+    cursor: pointer
+    background-color: transparent
+    border: none
+    outline: none
+
 input
     font-family: "Roboto", sans-serif
     background-color: transparent
@@ -31,6 +47,7 @@ input
     color: white
     font-weight: 700
     font-size: 1.15em
+    width: calc(100% - 100px)
 
 .row-data:first-child
     margin-top: 10px
