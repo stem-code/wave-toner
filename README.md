@@ -9,7 +9,7 @@
     <li>Run <i>npm install</i> in the project root directory.</li>
     <li>Run <i>npm install</i> in the project public directory (Angular).</li>
     <li>For development, run <i>ng serve</i> inside the public directory, then access port 4200 in a browser.</i>
-    <li>For full testing, run <i>ng build --prod</i> in the public directory, then run <i>npm start</i> in the public directory. (Will run on port 8080 by default).<i>
+    <li>For full testing, run <i>ng build --prod</i> in the public directory, then run <i>npm start</i> in the root directory. (Will run on port 8080 by default).<i>
 </ol>
 
 <h1>To-Do</h1>
