@@ -12,6 +12,7 @@ import { HelpComponent } from './help/help.component';
 import { FileWindowComponent } from './file-window/file-window.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { PlayerComponent } from './player/player.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { environment } from '../environments/environment';
     TitleScreenComponent,
     SettingsComponent,
     HelpComponent,
-    FileWindowComponent
+    FileWindowComponent,
+    PlayerComponent
   ],
   imports: [
     BrowserModule,
