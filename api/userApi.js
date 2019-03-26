@@ -3,7 +3,11 @@ let express = require('express')
 let models = require('../models/root');
 
 router.post('/createUser', (req, res) => {
+    console.log("Got request to create user...");
+    // res.json("Hello!");
     models.users.createUser(req.body.username, req.body.password, (err) => {
+        console.log("Callback called")
+        console.log(err);
         res.json({err:!!err});
     });
 });
