@@ -13,6 +13,7 @@ import { FileWindowComponent } from './file-window/file-window.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { PlayerComponent } from './player/player.component';
+import { FourierLabComponent } from './fourier-lab/fourier-lab.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { PlayerComponent } from './player/player.component';
     SettingsComponent,
     HelpComponent,
     FileWindowComponent,
-    PlayerComponent
+    PlayerComponent,
+    FourierLabComponent
   ],
   imports: [
     BrowserModule,

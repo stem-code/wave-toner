@@ -375,6 +375,9 @@ export class ToneGraphComponent implements OnInit {
     this.help.emit();
   }
 
+  openFourierLab() {
+  }
+
   // normalizeAmplitudes() { // Super inefficient, may need to find better way of doing this.
   //   let totalAmplitude = 1;
   //   console.log('Normalizing Amplitudes');
