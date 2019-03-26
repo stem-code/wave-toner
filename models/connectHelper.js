@@ -2,9 +2,10 @@ const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
 let password = process.env.PASS;
+let dbName = "wave-toner";
 
 // Connection URL
-const url = 'mongodb+srv://app:' + password + '@cluster0-rebfr.gcp.mongodb.net/wave-toner?retryWrites=true';
+const url = 'mongodb+srv://app:' + password + '@cluster0-rebfr.gcp.mongodb.net/' + dbName + '?retryWrites=true';
 
 // Create a new MongoClient
 const client = new MongoClient(url);
@@ -24,5 +25,5 @@ client.connect(function(err) {
 
     db = client.db(dbName);
     dbReady = true;
-    client.close();
+    // client.close();
 });

@@ -13,9 +13,9 @@ router.post('/authenticateUser', (req, res) => {
         if (!err && status){ // success, user is authenticated
             res.json({err: 0, auth: 1});
         } else if (!err && !status){ // success, but username or password incorrect
-            res.json({err:0, auth: 0})
+            res.json({err:0, auth: 0});
         } else {
-            res.json({err: 1})
+            res.json({err: 1});
         }
     });
 });
