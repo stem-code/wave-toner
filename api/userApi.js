@@ -1,6 +1,10 @@
 let express = require('express')
-  , router = express.Router()
+  , router = express.Router();
 let models = require('../models/root');
+
+router.get('/bob', (req, res) => {
+    res.json({OK: 1});
+});
 
 router.post('/createUser', (req, res) => {
     console.log("Got request to create user...");
