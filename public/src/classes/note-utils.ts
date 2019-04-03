@@ -1,3 +1,5 @@
+import { AudioManager } from 'src/app/audio-manager/audioManager';
+
 // About the Tone Class
 // A Tone is a single sound, it's frequency, volume, and stereo balance can vary over time.
 // Events are added to the Tone's timeline to specify when settings (volume, frequency, stereo) should be changed
@@ -18,8 +20,8 @@ export class Tone {
 
     private gainValue = 0;
 
-    constructor(audioCtx, connectorNode) {
-        this.audioCtx = audioCtx;
+    constructor(audioManager: AudioManager) {
+        this.audioCtx = audioManager.getAudioCtx();
 
         this.oscillator = <OscillatorNode>this.audioCtx.createOscillator();
         this.panner = <StereoPannerNode>this.audioCtx.createStereoPanner();
@@ -27,7 +29,7 @@ export class Tone {
 
         this.oscillator.connect(this.gain);
         this.gain.connect(this.panner);
-        this.panner.connect(connectorNode);
+        this.panner.connect(audioManager.currentConnectorNode);
     }
 
     stop(time: number, clear: boolean) {
@@ -105,6 +107,9 @@ export class Tone {
     }
 
     setAmplitude(amplitude: number, time: number = 0, rampTime: number = 0) { // Volume
+        // console.log('Setting amplitude');
+        // console.log(amplitude, time, rampTime);
+        // console.log('-----------------------------------');
         this.gainValue = amplitude;
         if (rampTime > 0) {
             setTimeout(() => {
@@ -132,23 +137,32 @@ export class Timber { // Combine multiple notes along with  to make more realist
     id: number;
     preppedTones: Tone[] = [];
 
-    constructor(...notes: Tone[]) {
+    audioManager: AudioManager;
+
+    constructor(audioManager: AudioManager, ...notes: Tone[]) {
         this.tones = notes;
+        this.audioManager = audioManager;
+        this.audioCtx = audioManager.getAudioCtx();
     }
 
-    addTone(audioCtx: AudioContext, tone: Tone) { // Add tone to make timber more complex
-        this.audioCtx = audioCtx;
+    addTone( tone: Tone) { // Add tone to make timber more complex
         this.tones.push(tone);
     }
 
     play() {
+        // console.log('Ready to play....');
+        // console.log(this.tones);
         this.tones.forEach(tone => {
             tone.prepTimeline();
             tone.start();
         });
     }
 
-    stop(time: number) {
+    stop(time?: number) {
+        if (!time) {
+            time = this.audioManager.getAudioCtx().currentTime;
+        }
+
         this.tones.forEach(tone => {
             tone.stop(time, true);
         });

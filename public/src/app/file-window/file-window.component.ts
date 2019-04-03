@@ -25,6 +25,7 @@ export class FileWindowComponent implements OnInit, OnChanges {
 
   ngOnChanges(change: any) {
     this.saves = SaveManager.retrieveAllSaves() || [];
+    console.log(this.saves);
     this.fieldValue = this.saves[0].name;
   }
 

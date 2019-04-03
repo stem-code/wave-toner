@@ -2,6 +2,14 @@
   <h1>Settings</h1>
   <div class="close-button" (click)="closeWindow()"></div>
   <div class="check-option">
-    <input type="checkbox" checked> <span>Enable Quick Wave Drawings (BETA)</span>
+    <label class="switch">
+      <input type="checkbox" disabled><span class="slider round" disabled></span>
+    </label>
+    <p class="switchText">Enable Quick Wave Drawings (BETA)</p>
+    <br/>
+    <label class="switch">
+      <input type="checkbox" [(ngModel)]="settingsManager.sliderEdit"><span class="slider round"></span>
+    </label>
+    <p class="switchText">Use Sliders To Edit Waves</p>
   </div>
 </div>

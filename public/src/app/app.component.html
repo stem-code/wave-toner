@@ -1,21 +1,84 @@
+
+<div id="settings-panel">
+    <div id="settings-header">
+        <h2>Wave Editor</h2>
+        <div id="help" class="top-icon" (click)="openHelp()"></div>
+        <div id="settings" class="top-icon" (click)="openSettings()"></div>
+    </div>
+
+    <div id="wave-wrapper" #waveWrapper>
+        <div class="wave-container" *ngFor="let wave of waves; let i=index;">
+            <div class="close-button" *ngIf="!wave.editing && !wave.base" (click)="deleteWave(i)"></div>
+            <h3 *ngIf="!wave.editing" (click)="wave.editing=true; focusInput()" wave.name [ngClass]="{'italics': !wave.name.length, 'rightMargin': !wave.base}">{{wave.name || "Untitled Wave"}}</h3>
+            <input class="notouch" *ngIf="wave.editing" [(ngModel)]="wave.name" type="text" placeholder="Wave Name" (blur)="wave.editing=false" autofocus>
+            
+            <div class="sliders" *ngIf="!wave.base">
+                <!-- <p>Wavelength: </p>
+                <input type="range" min="0" max="100" [(ngModel)]="wave.wavelength" (ngModelChange)="changeWav(i)"/>
+                        -->
+
+                <p>Amplitude: </p>
+                <div class="slider-wrapper">
+                    <input class="slider" type="range" min="0" max="80" [(ngModel)]="wave.amplitude" *ngIf="settingsManager.sliderEdit"/>
+                    <input class="notouch" type="number" min="0" max="80" [(ngModel)]="wave.amplitude" *ngIf="!settingsManager.sliderEdit"/>
+                    <div class="sticky-indicator" [ngStyle]="{'transform':'translate(80%, ' + (-25-waveWrapper.scrollTop) + 'px)'}">{{wave.amplitude}}% of base amplitude.</div>
+                </div>
+                <p>Frequency: </p>
+                <div class="slider-wrapper">
+                    <input class="slider" type="range" min="0" max="800" [(ngModel)]="wave.frequency" (ngModelChange)="changeFreq(i)" *ngIf="settingsManager.sliderEdit"/>
+                    <input class="notouch" type="number" min="0" max="800" [(ngModel)]="wave.frequency" (ngModelChange)="changeFreq(i)" *ngIf="!settingsManager.sliderEdit"/>
+                    <div class="sticky-indicator" [ngStyle]="{'transform':'translate(80%, ' + (-25-waveWrapper.scrollTop) + 'px)'}">{{wave.frequency}}% of base frequency.</div>
+                </div>
+            </div>
+
+            <span class="italics" *ngIf="wave.base">This wave is automatically set to the current note, all waves below are based on this wave.</span>
+
+            <!--
+                    <p *ngIf="wave.base">This is the base frequency. Frequency is automatically set depening on the note.</p> -->
+            <!-- <p *ngIf="!wave.base">Set the frequency relative to the base frequency.</p> -->
+        </div>
+        <button (click)="newWave()">New Wave</button>
+        <div id="chevron" (click)="toggleMenu()"></div>
+    </div>
+</div>
+
+<div id="canvas-container">
+    <div id="noteInfo-container">
+        <div id="noteInfo-wrapper">
+            <div class="note-info">
+                <p>Note Name: </p>
+                <h2>{{currentNoteName}}</h2>
+            </div>
+            <div class="note-info">
+                <p>Base Frequency:</p>
+                <h2>{{currentNoteFreq || 0}} Hz</h2>
+            </div>
+            <div class="note-info">
+                <p>Octave:</p>
+                <h2>{{ octave }}</h2>
+            </div>
+            <div class="note-info">
+                <p>Wavetype:</p>
+                <h2>{{(currentNoteFreq.length > 0) ? 'Sine' : 'None'}}</h2>
+            </div>
+            <div class="note-info">
+                <p># of waves:</p>
+                <h2>{{waves.length}}</h2>
+            </div>
+        </div>
+    </div>
+    <app-tone-graph [baseWave]="baseWave" [waves]="waves"></app-tone-graph>
+</div>
+
 <div id="play-panel">
-    <app-tone-graph (settings)="openSettings()" (help)="openHelp()"></app-tone-graph>
     <app-settings id="settings-dialog" (close)="closeSettings()"></app-settings>
     <app-help id="help-dialog" (close)="closeHelp()"></app-help>
+    <app-file-window [mode]="fileMode" [savedata]="waves" (wavesdata)="setWaveData($event)"></app-file-window>
 </div>
-<!-- <experiment-panel>
 
-</experiment-panel> -->
-
-<!-- <div  -->
-
-<!-- <h1>Tone Generator</h1>
-<button id="playnote">Play Note</button>
-<button id="stopnote">Stop Note</button>
-<p>Frequency 1: <span id="hertz"></span> Hz</p>
-<p>Frequency 2: <span id="hertz2"></span> Hz</p>
-
-<input type="range" min="0" max="5000" value="50" class="slider" id="myRange"/>
-<input type="range" min="0" max="5000" value="50" class="slider" id="myRange2"/>
-
-<router-outlet></router-outlet> -->
+<div id="roundButton-container">
+    <button (click)="save()" class="roundButton" id="save-button"></button>
+    <button (click)="open()" class="roundButton" id="open-button"></button>
+    <button (click)="open()" class="roundButton" id="fourier-button"></button>
+    <button (click)="playMusic()" class="roundButton" id="play-button"></button>
+</div>
