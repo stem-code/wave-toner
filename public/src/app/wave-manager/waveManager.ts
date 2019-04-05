@@ -26,6 +26,15 @@ export class WaveManager {
 
   constructor() {
     this.audioManager = new AudioManager();
+
+    const currentTimber = new Timber(this.audioManager);
+    const tone = new Tone(this.audioManager);
+    tone.setFrequency(300);
+    tone.setAmplitude(0.1);
+    tone.setPan(0);
+
+    currentTimber.addTone(tone);
+    currentTimber.play();
   }
 
   public setBaseFrequency(baseFreq: number) {
