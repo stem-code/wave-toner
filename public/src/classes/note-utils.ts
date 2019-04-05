@@ -7,7 +7,6 @@ import { AudioManager } from 'src/app/audio-manager/audioManager';
 // Calling the start method triggers this timeline, and will immediately start playing all the settings it was given
 // This is meant to be well-optimized, fast, and flexible
 type timelineType = 'frequency' | 'amplitude' | 'pan';
-// let preppedTones =
 
 export class Tone {
     private oscillator: OscillatorNode;
@@ -19,6 +18,7 @@ export class Tone {
     private timelineId = 1; // increment ID for different tone timeline events
 
     private gainValue = 0;
+    private hasStarted = false;
 
     constructor(audioManager: AudioManager) {
         this.audioCtx = audioManager.getAudioCtx();
@@ -37,6 +37,7 @@ export class Tone {
         this.oscillator.frequency.cancelScheduledValues(0); // immediately cancel all scheduled values
         this.gain.gain.cancelScheduledValues(0);
         this.panner.pan.cancelScheduledValues(0);
+
         if (navigator.appName !== 'Netscape') {
             this.gain.gain.setTargetAtTime(0, time, 0.015);
         } else {
@@ -66,7 +67,11 @@ export class Tone {
 
     start(time: number = 0) {
         this.gain.gain.setValueAtTime(0, 0);
-        this.oscillator.start(time);
+        if (!this.hasStarted) {
+            this.oscillator.start(time);
+        }
+        this.hasStarted = true;
+
         if (navigator.appName !== 'Netscape') {
             this.gain.gain.setTargetAtTime(this.gainValue, time, 0.015);
         } else {
@@ -139,6 +144,8 @@ export class Timber { // Combine multiple notes along with  to make more realist
 
     audioManager: AudioManager;
 
+    public onPlay;
+
     constructor(audioManager: AudioManager, ...notes: Tone[]) {
         this.tones = notes;
         this.audioManager = audioManager;
@@ -150,6 +157,10 @@ export class Timber { // Combine multiple notes along with  to make more realist
     }
 
     play() {
+        if (this.onPlay) {
+            this.onPlay();
+        }
+
         this.tones.forEach(tone => {
             tone.prepTimeline();
             tone.start();
@@ -162,7 +173,8 @@ export class Timber { // Combine multiple notes along with  to make more realist
         }
 
         this.tones.forEach(tone => {
-            tone.stop(time, true);
+            // tone.stop(time, true);
+            tone.stop(time, false);
         });
     }
 

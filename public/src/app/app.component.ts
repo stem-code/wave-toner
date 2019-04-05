@@ -59,6 +59,7 @@ export class AppComponent implements OnInit { // Main Class
     );
     this.baseWave = this.waves[this.waves.length - 1]; // set the base
     this.WaveManager.setWaves(this.waves);
+    this.KeyboardManager.prepSounds();
   }
 
   openSettings() {
@@ -104,6 +105,7 @@ export class AppComponent implements OnInit { // Main Class
       amplitude: 50, editing: false, priorNum: 0, frequency: 100}
     );
     this.WaveManager.setWaves(this.waves);
+    this.KeyboardManager.prepSounds();
   }
 
   toggleMenu() {

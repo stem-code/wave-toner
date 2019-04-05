@@ -10,6 +10,8 @@ export class KeyboardManager {
   waveManager;
   setDisplayOctave;
 
+  noteHarmonics = {};
+
   constructor(noteFreqMap, setCurrentNoteInfo, setOctave, waveManager, octave: number = 2) {
     this.octave = octave;
     this.noteFreqMap = noteFreqMap;
@@ -70,6 +72,18 @@ export class KeyboardManager {
     });
   }
 
+  prepSounds() {
+    console.log('Prepping Sounds');
+    for (const noteRange in this.noteFreqMap) {
+      if (!this.noteFreqMap[noteRange]) { continue; }
+      for (const note of this.noteFreqMap[noteRange]) {
+        console.log(noteRange, note);
+
+        this.noteHarmonics[note] = this.waveManager.constructHarmonic(note, 1);
+      }
+    }
+  }
+
   setOctave(o) {
     this.octave = o;
   }
@@ -82,7 +96,8 @@ export class KeyboardManager {
       this.setCurrentNoteInfo(currentNoteName, baseFrequency);
 
       // console.log('Constructing Harmonic with the WaveManager');
-      this.waveManager.constructHarmonic(baseFrequency, 1);
+      // this.waveManager.constructHarmonic(baseFrequency, 1);
+      this.noteHarmonics[baseFrequency].play();
     } else {
       console.log('NOT FOUND', char);
     }

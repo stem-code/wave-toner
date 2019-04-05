@@ -37,6 +37,10 @@ export class WaveManager {
     // currentTimber.play();
   }
 
+  public prepSounds() {
+
+  }
+
   public setBaseFrequency(baseFreq: number) {
     this.baseFrequency = baseFreq;
   }
@@ -66,6 +70,7 @@ export class WaveManager {
         frequency = baseFrequency;
         amplitude = baseAmplitude / ((this.waves.length * this.harmonic.length + 2)); // The total amount of waves
         // console.log('Base amplitude is: ', amplitude);
+        console.log(frequency, amplitude);
       } else {
         frequency = (wave.frequency / 100) * baseFrequency; // Frequency is based on the frequency of the base.
         // console.log('New frequency is: ', frequency);
@@ -80,10 +85,14 @@ export class WaveManager {
 
       currentTimber.addTone(tone);
     });
-    currentTimber.play();
-    this.harmonic.push(currentTimber);
-    // console.log('------------------------------------------------------------');
-    // console.log(this.harmonic);
+    // currentTimber.play();
+    // this.harmonic.push(currentTimber);
+
+    currentTimber.onPlay = () => {
+      this.harmonic.push(currentTimber);
+    };
+
+    return currentTimber;
   }
 
   destroyHarmonic(baseFrequency: number) {
@@ -91,7 +100,6 @@ export class WaveManager {
       if (timber.getId() === baseFrequency) { // Check if it is the one we want to turn off
         timber.stop(this.audioManager.getAudioCtx().currentTime);
         this.harmonic.splice(idx, 1);
-        // console.log('Splicing', this.harmonic);
       }
     });
   }
