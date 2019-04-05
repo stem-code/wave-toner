@@ -55,7 +55,7 @@ export class WaveManager {
 
       if (wave.base) {
         frequency = baseFrequency;
-        amplitude = baseAmplitude / (this.waves.length * this.harmonic.length + 2); // The total amount of waves
+        amplitude = baseAmplitude / ((this.waves.length * this.harmonic.length + 2)); // The total amount of waves
         // console.log('Base amplitude is: ', amplitude);
       } else {
         frequency = (wave.frequency / 100) * baseFrequency; // Frequency is based on the frequency of the base.
@@ -66,7 +66,7 @@ export class WaveManager {
 
       const tone = new Tone(this.audioManager);
       tone.setFrequency(frequency);
-      tone.setAmplitude(amplitude);
+      tone.setAmplitude(amplitude, 0, 0.3);
       tone.setPan(0);
 
       currentTimber.addTone(tone);

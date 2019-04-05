@@ -150,8 +150,6 @@ export class Timber { // Combine multiple notes along with  to make more realist
     }
 
     play() {
-        // console.log('Ready to play....');
-        // console.log(this.tones);
         this.tones.forEach(tone => {
             tone.prepTimeline();
             tone.start();

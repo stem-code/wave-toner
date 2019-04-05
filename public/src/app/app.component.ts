@@ -141,9 +141,20 @@ export class AppComponent implements OnInit { // Main Class
   }
 
   playMusic() {
-    MusicBox.playMusic((o) => {
-      this.octave = o;
-      this.KeyboardManager.setOctave(o);
+    // MusicBox.playMusic((o) => {
+    //   this.octave = o;
+    //   this.KeyboardManager.setOctave(o);
+    // });
+
+    MusicBox.playMusic(note => {
+      this.octave = +note[note.length - 1];
+      note = note.substr(0, note.length - 1);
+
+      this.KeyboardManager.setOctave(this.octave);
+      this.KeyboardManager.playNote(note);
+    }, note => {
+      note = note.substr(0, note.length - 1);
+      this.KeyboardManager.stopNote(note);
     });
   }
 }
