@@ -157,5 +157,9 @@ export class AppComponent implements OnInit { // Main Class
       this.KeyboardManager.stopNote(note);
     });
   }
+
+  upload() {
+    $('input[type=file]').click();
+  }
 }
 

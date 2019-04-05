@@ -7,7 +7,7 @@
     </div>
 
     <div id="wave-wrapper" #waveWrapper>
-            <input type="file">
+        <input type="file">
         <div class="wave-container" *ngFor="let wave of waves; let i=index;">
             <div class="close-button" *ngIf="!wave.editing && !wave.base" (click)="deleteWave(i)"></div>
             <h3 *ngIf="!wave.editing" (click)="wave.editing=true; focusInput()" wave.name [ngClass]="{'italics': !wave.name.length, 'rightMargin': !wave.base}">{{wave.name || "Untitled Wave"}}</h3>
@@ -80,6 +80,6 @@
 <div id="roundButton-container">
     <button (click)="save()" class="roundButton" id="save-button"></button>
     <button (click)="open()" class="roundButton" id="open-button"></button>
-    <button (click)="open()" class="roundButton" id="fourier-button"></button>
+    <button (click)="upload()" class="roundButton" id="fourier-button"></button>
     <button (click)="playMusic()" class="roundButton" id="play-button"></button>
 </div>
