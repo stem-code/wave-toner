@@ -10,7 +10,8 @@ export class KeyboardManager {
   waveManager;
   setDisplayOctave;
 
-  noteHarmonics = {};
+  // noteHarmonics = {};
+  noteHarmonics = [];
 
   constructor(noteFreqMap, setCurrentNoteInfo, setOctave, waveManager, octave: number = 2) {
     this.octave = octave;
@@ -50,10 +51,7 @@ export class KeyboardManager {
       }
 
       if (noteFreqMap.hasOwnProperty(char)) {
-        for (let i = 0; i < noteFreqMap[char].length; i++) { // destroy all matching notes on all octaves
-          const baseFrequency = noteFreqMap[char][i];
-          waveManager.destroyHarmonic(baseFrequency); // destroy the frequency, using its unique base frequency as an identifier
-        }
+        this.stopNote(char);
 
         try {
           // now that the current key has been depressed, there is a slight chance that its information was being shown to the user
@@ -74,13 +72,9 @@ export class KeyboardManager {
 
   prepSounds() {
     console.log('Prepping Sounds');
-    for (const noteRange in this.noteFreqMap) {
-      if (!this.noteFreqMap[noteRange]) { continue; }
-      for (const note of this.noteFreqMap[noteRange]) {
-        console.log(noteRange, note);
-
-        this.noteHarmonics[note] = this.waveManager.constructHarmonic(note, 1);
-      }
+    this.noteHarmonics = [];
+    for (let i = 0; i < 12; i++) { // 7 "parking spots"
+      this.noteHarmonics.push(this.waveManager.constructHarmonic());
     }
   }
 
@@ -89,25 +83,43 @@ export class KeyboardManager {
   }
 
   playNote(char) {
+    // console.log('Start time = ', Date.now());
     char = char.toLowerCase();
     if (this.noteFreqMap.hasOwnProperty(char)) { // Check if we have a current frequency for the note.
       const currentNoteName = char.toUpperCase(); // Adjust the variables that we will display to the user (see HTML)
       const baseFrequency = this.noteFreqMap[char][this.octave];
       this.setCurrentNoteInfo(currentNoteName, baseFrequency);
 
-      // console.log('Constructing Harmonic with the WaveManager');
-      // this.waveManager.constructHarmonic(baseFrequency, 1);
-      this.noteHarmonics[baseFrequency].play();
+      for (const harmonic of this.noteHarmonics) {
+        if (harmonic.getAvailibility()) { // if it is available
+          // console.log('Found an available spot');
+          harmonic.setAvailibility(false);
+          setTimeout(() => {
+            this.waveManager.updateHarmonic(harmonic, baseFrequency, 1);
+          }, 0);
+
+          setTimeout(() => {
+            harmonic.play(0);
+          }, 200);
+          return;
+        }
+      }
+
+      console.log('No More parking');
+
     } else {
       console.log('NOT FOUND', char);
     }
   }
 
   stopNote(char) {
+    // console.log('Launching stop mechanism');
     char = char.toLowerCase();
     for (let i = 0; i < this.noteFreqMap[char].length; i++) { // destroy all matching notes on all octaves
       const baseFrequency = this.noteFreqMap[char][i];
-      this.waveManager.destroyHarmonic(baseFrequency); // destroy the frequency, using its unique base frequency as an identifier
+      setTimeout(() => {
+        this.waveManager.destroyHarmonic(baseFrequency); // destroy the frequency, using its unique base frequency as an identifier
+      }, 200);
     }
   }
 }

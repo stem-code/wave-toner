@@ -50,6 +50,11 @@ export class AppComponent implements OnInit { // Main Class
       },
       this.WaveManager,
       this.octave);
+
+    $(document).on('mouseup', () => {
+      this.WaveManager.setWaves(this.waves);
+      this.KeyboardManager.prepSounds();
+    });
   }
 
   ngOnInit() {

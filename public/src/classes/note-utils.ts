@@ -8,6 +8,55 @@ import { AudioManager } from 'src/app/audio-manager/audioManager';
 // This is meant to be well-optimized, fast, and flexible
 type timelineType = 'frequency' | 'amplitude' | 'pan';
 
+let HighResolutionTimer = window['HighResolutionTimer'] = window['HighResolutionTimer'] || (function() {
+    let HighResolutionTimer = function(options) {
+      this.timer = false;
+      this.total_ticks = 0;
+
+      this.start_time = undefined;
+      this.current_time = undefined;
+      this.duration = (options.duration) ? options.duration : 1000;
+      this.callback = (options.callback) ? options.callback : function() {};
+
+      this.run = function() {
+        this.current_time = Date.now();
+        if (!this.start_time) { this.start_time = this.current_time; }
+
+        this.callback(this);
+
+        const nextTick = this.duration - (this.current_time - (this.start_time + (this.total_ticks * this.duration) ) );
+        this.total_ticks++;
+
+        (function(i) {
+          i.timer = setTimeout(function() {
+            i.run();
+          }, nextTick);
+        }(this));
+
+        return this;
+      };
+
+      this.stop = function() {
+        clearTimeout(this.timer);
+        return this;
+      };
+
+      return this;
+    };
+
+    return HighResolutionTimer;
+  }());
+
+//   var _timer = HighResolutionTimer({
+//     duration: 1000,
+//     callback: function(timer) {
+//       var hours = Math.floor( ( ( (1000 / timer.duration) * timer.total_ticks) / 60) / 24) % 24;
+//       var minutes = Math.floor( ( (1000 / timer.duration) * timer.total_ticks) / 60) % 60;
+//       var seconds = ( (1000 / timer.duration) * timer.total_ticks) % 60;
+//       console.log(hours, minutes, seconds);
+//     }
+// });
+
 export class Tone {
     private oscillator: OscillatorNode;
     private panner: StereoPannerNode;
@@ -41,7 +90,10 @@ export class Tone {
         if (navigator.appName !== 'Netscape') {
             this.gain.gain.setTargetAtTime(0, time, 0.015);
         } else {
-            this.gain.gain.linearRampToValueAtTime(0, time + 0.1);
+            // this.gain.gain.linearRampToValueAtTime(0, time + 0.03);
+            this.gain.gain.setTargetAtTime(0, time + 0.03, 0.02);
+            // this.gain.gain.linearRampToValueAtTime(0, time + 0.05);
+            // this.gain.gain.setValueAtTime(0.0001, time);
         }
 
         if (clear) {
@@ -66,19 +118,28 @@ export class Tone {
     }
 
     start(time: number = 0) {
-        this.gain.gain.setValueAtTime(0, 0);
+        console.log(time);
+        if (!time) {
+            time = this.audioCtx.currentTime;
+        }
+        // console.log('End time = ', Date.now());
+        // console.log(time);
+        // console.log(this.audioCtx.currentTime);
         if (!this.hasStarted) {
             this.oscillator.start(time);
         }
         this.hasStarted = true;
 
+        // this.gain.gain.setValueAtTime(0, 0);
+
         if (navigator.appName !== 'Netscape') {
             this.gain.gain.setTargetAtTime(this.gainValue, time, 0.015);
         } else {
-            this.gain.gain.linearRampToValueAtTime(this.gainValue, time + 0.1);
+            // this.gain.gain.exponentialRampToValueAtTime(this.gainValue, time + 0.3);
+            // this.gain.gain.linearRampToValueAtTime(this.gainValue, time + 0.05);
+            // this.gain.gain.setValueAtTime(this.gainValue, time);
+            this.gain.gain.setTargetAtTime(this.gainValue, time + 0.03, 0.02);
         }
-        // this.gain.gain.setTargetAtTime(this.gainValue, time, 0.1);
-        // console.log('starting oscillators');
     }
 
     clear() {
@@ -144,6 +205,8 @@ export class Timber { // Combine multiple notes along with  to make more realist
 
     audioManager: AudioManager;
 
+    available = true;
+
     public onPlay;
 
     constructor(audioManager: AudioManager, ...notes: Tone[]) {
@@ -156,14 +219,15 @@ export class Timber { // Combine multiple notes along with  to make more realist
         this.tones.push(tone);
     }
 
-    play() {
+    play(time: number) {
+        // console.log('Play');
         if (this.onPlay) {
             this.onPlay();
         }
 
         this.tones.forEach(tone => {
             tone.prepTimeline();
-            tone.start();
+            tone.start(time);
         });
     }
 
@@ -184,5 +248,20 @@ export class Timber { // Combine multiple notes along with  to make more realist
 
     getId() {
         return this.id;
+    }
+
+    getTones() {
+        return this.tones;
+    }
+
+    popTone() {
+        this.tones.pop();
+    }
+
+    setAvailibility(availibility: boolean) {
+        this.available = availibility;
+    }
+    getAvailibility() {
+        return this.available;
     }
 }
