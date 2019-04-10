@@ -30,6 +30,7 @@ export class ToneGraphComponent implements OnInit {
     // https://www.w3schools.com/html/html5_canvas.asp
     
     this.renderingContext.fillRect(0, 0, 100, 100);
+    console.log("Init Canvas");
 
     const samples = 100;
     // const moveRate = -(1 / samples) * this.canvasWidth;
