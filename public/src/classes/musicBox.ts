@@ -75,7 +75,13 @@ export abstract class MusicBox {
 
       // Load a MIDI file
       // Player.loadFile('./assets/test.mid');
+      // Player.setTempo(200);
       Player.play();
+
+      // let playerEvents = Player.getEvents();
+      // for (let event in playerEvents) {
+
+      // }
 
       Player.on('midiEvent', function(event) {
         // Do something when a MIDI event is fired.
@@ -83,6 +89,7 @@ export abstract class MusicBox {
         // console.log(event);
         // console.log(event.name);
         if (event.name === 'Note on') {
+          // console.log(event);
           // console.log(event.noteName, event.velocity);
           if (event.velocity === 0) {
             stopNote(event.noteName);

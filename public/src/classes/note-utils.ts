@@ -67,6 +67,8 @@ export class Tone {
     private timelineId = 1; // increment ID for different tone timeline events
 
     private gainValue = 0;
+    private freqValue = 0;
+
     private hasStarted = false;
 
     constructor(audioManager: AudioManager) {
@@ -108,17 +110,17 @@ export class Tone {
             if (!this.timeline.hasOwnProperty(timelineKey)) { return; }
             const timelineEvent = this.timeline[timelineKey];
             if (timelineEvent.type === 'frequency') {
-                this.setFrequency(timelineEvent.value, this.audioCtx.currentTime + timelineEvent.time, timelineEvent.rampTime);
+                this.setFrequency(timelineEvent.value, this.audioCtx.currentTime + timelineEvent.time);
             } else if (timelineEvent.type === 'amplitude') {
-                this.setAmplitude(timelineEvent.value, this.audioCtx.currentTime + timelineEvent.time, timelineEvent.rampTime);
+                this.setAmplitude(timelineEvent.value, this.audioCtx.currentTime + timelineEvent.time);
             } else if (timelineEvent.type === 'pan') {
                 this.setPan(timelineEvent.value, this.audioCtx.currentTime + timelineEvent.time, timelineEvent.rampTime);
             }
         });
     }
 
-    start(time: number = 0) {
-        console.log(time);
+    start(time: number = 0) { // Called once, starts the oscillator
+        // console.log('start');
         if (!time) {
             time = this.audioCtx.currentTime;
         }
@@ -132,14 +134,14 @@ export class Tone {
 
         // this.gain.gain.setValueAtTime(0, 0);
 
-        if (navigator.appName !== 'Netscape') {
-            this.gain.gain.setTargetAtTime(this.gainValue, time, 0.015);
-        } else {
-            // this.gain.gain.exponentialRampToValueAtTime(this.gainValue, time + 0.3);
-            // this.gain.gain.linearRampToValueAtTime(this.gainValue, time + 0.05);
-            // this.gain.gain.setValueAtTime(this.gainValue, time);
-            this.gain.gain.setTargetAtTime(this.gainValue, time + 0.03, 0.02);
-        }
+        // if (navigator.appName !== 'Netscape') {
+        //     this.gain.gain.setTargetAtTime(this.gainValue, time, 0.015);
+        // } else {
+        //     // this.gain.gain.exponentialRampToValueAtTime(this.gainValue, time + 0.3);
+        //     // this.gain.gain.linearRampToValueAtTime(this.gainValue, time + 0.05);
+        //     // this.gain.gain.setValueAtTime(this.gainValue, time);
+        //     this.gain.gain.setTargetAtTime(this.gainValue, time + 0.03, 0.02);
+        // }
     }
 
     clear() {
@@ -162,28 +164,16 @@ export class Tone {
         delete this.timeline[id];
     }
 
-    setFrequency(frequency: number, time: number = 0, rampTime: number = 0) { // ramptime specifies how long it should transition
-        if (rampTime > 0) {
-            setTimeout(() => {
-                this.oscillator.frequency.linearRampToValueAtTime(frequency, rampTime);
-            }, time);
-        } else {
-            this.oscillator.frequency.setValueAtTime(frequency, time);
-        }
+    setFrequency(frequency: number, time: number = 0) { // ramptime specifies how long it should transition
+        this.oscillator.frequency.setValueAtTime(frequency, time);
     }
 
-    setAmplitude(amplitude: number, time: number = 0, rampTime: number = 0) { // Volume
-        // console.log('Setting amplitude');
-        // console.log(amplitude, time, rampTime);
-        // console.log('-----------------------------------');
+    setAmplitude(amplitude: number, time: number = 0) { // Volume
+        // console.log('Setting amplitude to: ', amplitude);
+        // console.log('Got a change in amplitude at time: ', time, ' of ', amplitude);
+        this.gain.gain.setValueAtTime(amplitude, time); // Starting at our current value
+        // this.gain.gain.linearRampToValueAtTime(amplitude, time + rampTime); // We exponentially decay/grow
         this.gainValue = amplitude;
-        if (rampTime > 0) {
-            setTimeout(() => {
-                this.gain.gain.linearRampToValueAtTime(amplitude, rampTime);
-            }, time);
-        } else {
-            this.gain.gain.setValueAtTime(amplitude, time);
-        }
     }
 
     setPan(pan: number, time: number = 0, rampTime: number = 0) { // Stereo sound (Left and Right). Must be between -1 and 1.

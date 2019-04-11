@@ -57,14 +57,17 @@ export class WaveManager {
     return this.waves;
   }
 
-  public updateHarmonic(harmonic: Timber, baseFrequency: number, baseAmplitude: number) {
+  public updateHarmonic(harmonic: Timber, baseFrequency: number, baseAmplitude: number, time: number = 0) {
     // Always align the number of tones with the number of waves
     // Because each tone will be playing a separate wave to form a harmonic
+    // console.log('updating harmonic', this.waves.length);
 
     while (harmonic.getTones().length < this.waves.length) {
+      // console.log('Not enough / too many tones');
       harmonic.addTone(new Tone(this.audioManager));
     }
     while (harmonic.getTones().length > this.waves.length) {
+      // console.log('Not enough / too many tones');
       harmonic.popTone(); // remove any tones that are extra (unnecessary)
     }
 
@@ -76,21 +79,29 @@ export class WaveManager {
 
       if (wave.base) {
         frequency = baseFrequency;
-        amplitude = baseAmplitude / ((this.waves.length * (frequency / 200 + 1))); // divide by the total amount of waves
+        amplitude = baseAmplitude / ((this.waves.length * (frequency / 200 + 1) * 5)); // divide by the total amount of waves
         // amplitude = baseAmplitude / 100;
         // console.log('Base amplitude is: ', amplitude);
       } else {
         frequency = (wave.frequency / 100) * baseFrequency; // Frequency is based on the frequency of the base.
         // console.log('New frequency is: ', frequency);
-        amplitude = (wave.amplitude / 100) * baseAmplitude / (this.waves.length * (frequency / 200 + 1));
+        amplitude = (wave.amplitude / 100) * baseAmplitude / (this.waves.length * (frequency / 200 + 1) * 5);
         // amplitude = ((wave.amplitude / 100) * baseAmplitude) / 100;
         // console.log('New Amplitude is', amplitude);
       }
 
       const tone = tones[idx];
-      tone.setFrequency(frequency);
-      tone.setAmplitude(amplitude, 0, 0.3);
+
+      if (frequency >= 0) {
+        tone.setFrequency(frequency, time);
+      }
+
+      if (amplitude > 0) {
+        tone.setAmplitude(amplitude, time);
+      }
+
       tone.setPan(0);
+      tone.start(0);
     });
 
     harmonic.setId(baseFrequency);
@@ -106,18 +117,18 @@ export class WaveManager {
       this.updateHarmonic(currentTimber, baseFrequency, baseAmplitude);
     }
 
-    currentTimber.onPlay = () => {
-      this.harmonic.push(currentTimber);
-      // console.log('Appening to list of harmonics');
-    };
-
     return currentTimber;
   }
 
-  destroyHarmonic(baseFrequency: number) {
-    this.harmonic.forEach((timber, idx) => {
+  destroyHarmonic(baseFrequency: number, searchList) {
+    // console.log(this.harmonic.length);
+    searchList.forEach((timber, idx) => {
+      // console.log(timber.getId());
+      // console.log('Found it!');
       if (timber.getId() === baseFrequency) { // Check if it is the one we want to turn off
-        timber.stop(this.audioManager.getAudioCtx().currentTime);
+        // console.log('Found it!');
+        // timber.stop(this.audioManager.getAudioCtx().currentTime);
+        this.updateHarmonic(timber, 0, -1, this.audioManager.getAudioCtx().currentTime - 1);
         this.harmonic.splice(idx, 1);
         timber.setAvailibility(true);
       }

@@ -74,7 +74,9 @@ export class KeyboardManager {
     console.log('Prepping Sounds');
     this.noteHarmonics = [];
     for (let i = 0; i < 12; i++) { // 7 "parking spots"
-      this.noteHarmonics.push(this.waveManager.constructHarmonic());
+      const currentHarmonic = this.waveManager.constructHarmonic();
+      this.noteHarmonics.push(currentHarmonic);
+      currentHarmonic.play(0);
     }
   }
 
@@ -82,8 +84,14 @@ export class KeyboardManager {
     this.octave = o;
   }
 
-  playNote(char) {
-    // console.log('Start time = ', Date.now());
+
+  playNote(char, time: number = 0) {
+    if (!time) {
+      time = this.waveManager.audioManager.getAudioCtx().currentTime;
+      // console.log('Time switched to', time);
+    }
+
+    // console.log('Playing note');
     char = char.toLowerCase();
     if (this.noteFreqMap.hasOwnProperty(char)) { // Check if we have a current frequency for the note.
       const currentNoteName = char.toUpperCase(); // Adjust the variables that we will display to the user (see HTML)
@@ -93,14 +101,9 @@ export class KeyboardManager {
       for (const harmonic of this.noteHarmonics) {
         if (harmonic.getAvailibility()) { // if it is available
           // console.log('Found an available spot');
+          // console.log(this.noteHarmonics.indexOf(harmonic));
           harmonic.setAvailibility(false);
-          setTimeout(() => {
-            this.waveManager.updateHarmonic(harmonic, baseFrequency, 1);
-          }, 0);
-
-          setTimeout(() => {
-            harmonic.play(0);
-          }, 200);
+          this.waveManager.updateHarmonic(harmonic, baseFrequency, 1, time);
           return;
         }
       }
@@ -117,9 +120,7 @@ export class KeyboardManager {
     char = char.toLowerCase();
     for (let i = 0; i < this.noteFreqMap[char].length; i++) { // destroy all matching notes on all octaves
       const baseFrequency = this.noteFreqMap[char][i];
-      setTimeout(() => {
-        this.waveManager.destroyHarmonic(baseFrequency); // destroy the frequency, using its unique base frequency as an identifier
-      }, 200);
+      this.waveManager.destroyHarmonic(baseFrequency, this.noteHarmonics); // destroy the frequency, use base frequency as identifier
     }
   }
 }
