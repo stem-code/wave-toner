@@ -27,7 +27,7 @@ app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 app.use(express.static(path.join(__dirname, '/public/dist/tone-project'))); // serve Angular
-app.use(require('./api/root'));
+// app.use(require('./api/root'));
 
 app.listen(app.get('port'), () => {
     console.log("NodeJS App has started on port:", app.get('port'));
